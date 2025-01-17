@@ -1,5 +1,15 @@
-__pycache__/
+# Development files
 .vscode/
+
+# user files
+cookies.txt
+
+# build files
+__pycache__/
+build/
+dist/
+*.spec
+
+# virtual environment
 myenv/
 .venv/
-cookies.txt
