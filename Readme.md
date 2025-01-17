@@ -2,7 +2,7 @@
 
 *(No need for target account authentication information)*
 
-## Announcement
+## 0. Announcement
 
 **The script is only used for learning web knowledge. Please do not use this script to obtain unauthorized personal data !**
 
@@ -12,12 +12,11 @@
 
 **The author of this script is not responsible for any legal disputes arising from the use of this script.**
 
-## Introduction
+## 1. Introduction
 
 This script is used to automatically fetch the score from `ehall.xjtu.edu.cn`
 
-## Usage
-
+## 2. Usage of the python script
 1. Install the required packages
 
 ```bash
@@ -37,7 +36,96 @@ python main.py [-c|-s] [cookies's path] <student_id>
 - `cookies's path`: The path of the cookies file. You should export the cookies from the browser and save it to a file.
 - `student_id`: The student id of the target student.
 
-## Cookies
+## 3. Usage of `setup.sh`
+
+There are two setup scripts in the repository, `setup.sh` and `setup.ps1` for Linux and Windows respectively.
+These scripts help in setting up the environment, building, cleaning, running, and deactivating the virtual environment for the project.
+
+### Guide for setup.ps1:
+
+```powershell
+.\setup.ps1 {set_env|build|clean|run|deactivate}
+```
+
+#### Set up the environment
+Sets up the Python virtual environment and installs dependencies.
+
+```powershell
+.\setup.ps1 set_env
+```
+
+
+#### Run the project
+Runs the `main.py` script with optional arguments. The arguments are passed to the script. *See the usage of the python script.*
+
+```powershell
+.\setup.ps1 run [args]
+```
+
+#### Deactivate the virtual environment
+Deactivates the Python virtual environment.
+
+```powershell
+.\setup.ps1 deactivate
+```
+
+#### Build the project (into an **executable**)
+Builds the project using PyInstaller and creates an **executable** in the `dist` directory.
+
+```powershell
+.\setup.ps1 build
+```
+
+#### Clean the project
+Cleans up generated files and directories such as `dist`, `build`, `.venv`, `__pycache__`, and `main.spec`.
+
+```powershell
+.\setup.ps1 clean
+```
+
+### Guide for setup.sh:
+
+```bash
+./setup.sh {set_env|build|clean|run|deactivate}
+```
+
+#### Set up the environment
+Sets up the Python virtual environment and installs dependencies.
+
+```bash
+./setup.sh set_env
+```
+
+
+#### Run the project
+Runs the `main.py` script with optional arguments. The arguments are passed to the script. *See the usage of the python script.*
+
+```bash
+./setup.sh run [args]
+```
+
+#### Deactivate the virtual environment
+Deactivates the Python virtual environment.
+
+```bash
+./setup.sh deactivate
+```
+
+#### Build the project (into an **executable**)
+Builds the project using PyInstaller and creates an **executable** in the `dist` directory.
+
+```bash
+./setup.sh build
+```
+
+#### Clean the project
+Cleans up generated files and directories such as `dist`, `build`, `.venv`, `__pycache__`, and `main.spec`.
+
+```bash
+./setup.sh clean
+```
+
+## 4. Cookies
 
 1. Open the browser and login to `ehall.xjtu.edu.cn`.
 2. Rondomly choose a service, such as `个人方案查询`.
