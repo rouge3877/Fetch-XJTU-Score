@@ -54,7 +54,7 @@ def fetch_show_do(cookies_file, xh):
     
     # Check response and return result
     if response.status_code == 200:
-        print("Successfully reached the target URL.")
+        print("Successfully reached the target URL.", file=sys.stderr)
         return (True, response.text)
     else:
         return (False, f"Request failed, status code: {response.status_code}")
@@ -84,9 +84,9 @@ if __name__ == "__main__":
             try:
                 with open(output_file, 'w', encoding='utf-8') as f:
                     f.write(result)
-                print(f"Content saved as {output_file}")
+                print(f"Content saved as {output_file}", file=sys.stderr)
             except Exception as e:
-                print(f"Failed to save content: {e}")
+                print(f"Failed to save content: {e}", file=sys.stderr)
                 sys.exit(1)
         else:
             print(result)

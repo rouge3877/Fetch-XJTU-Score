@@ -47,7 +47,7 @@ def fetch_score_page(cookies_file, html_content):
                 break
     if not session_id:
         return (False, "Session ID was not found.")
-    print(f"Extracted sessionID: {session_id}")
+    print(f"Extracted sessionID: {session_id}", file=sys.stderr)
     
     # 3. Construct the target URL with the extracted session ID
     base_url = "https://ehall.xjtu.edu.cn/jwapp/sys/frReport2/show.do"
@@ -61,7 +61,7 @@ def fetch_score_page(cookies_file, html_content):
     }
     query_string = urlencode(params)
     target_url = f"{base_url}?{query_string}"
-    print(f"Constructed target URL: {target_url}")
+    print(f"Constructed target URL: {target_url}", file=sys.stderr)
     
     # 4. Set request headers (optional, recommended to simulate a browser)
     headers = {
@@ -81,7 +81,7 @@ def fetch_score_page(cookies_file, html_content):
     
     # 6. Check the response
     if response.status_code == 200:
-        print("Successfully accessed the target URL")
+        print("Successfully accessed the target URL", file=sys.stderr)
         return (True, response.text)
     else:
         return (False, f"Request failed with status code: {response.status_code}")
@@ -116,7 +116,7 @@ if __name__ == "__main__":
                     f.write(result)
                 print(f"Content saved as {output_file}")
             except Exception as e:
-                print(f"Failed to save content: {e}")
+                print(f"Failed to save content: {e}", file=sys.stderr)
                 sys.exit(1)
         else:
             print(result)
