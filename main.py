@@ -87,32 +87,54 @@ def printError(error_message):
     # exit the script    
     sys.exit(1)
 
+def printHelp():
+    """
+    Print the help message of the script.
+    """
+    print("Usage: python script.py [-c|-s] [cookies_file_path] <student_id>", file=sys.stderr)
+    print("Options:", file=sys.stderr)
+    print("\t-c: Parse the course mode, default is course mode.", file=sys.stderr)
+    print("\t-s: Parse the semester mode.", file=sys.stderr)
+    print("\tcookies_file_path: The path of the cookies file, default is ./cookies.txt.", file=sys.stderr)
+    print("\tstudent_id: The XJTU student id of the student.", file=sys.stderr)
+    sys.exit(1)
+
 def main():
     """
     Main function of the script (just a simple demo).
     """
-    if len(sys.argv) != 3 and len(sys.argv) != 2:
-        print("Usage: python script.py [cookies_file_path] <student_id>")
-        print("\tcookies_file_path: The path of the cookies file, default is ./cookies.txt.")
-        print("\tstudent_id: The student id of the student.")
-        sys.exit(1)
+    if len(sys.argv) != 4 and len(sys.argv) != 3 and len(sys.argv) != 2:
+        print("Error: Invalid number of arguments.", file=sys.stderr)
+        print("", file=sys.stderr)
+        printHelp()
+    elif len(sys.argv) == 4:
+        if sys.argv[1] == "-c":
+            parse_mode = 'course'
+        elif sys.argv[1] == "-s":
+            parse_mode = 'semester'
+        else:
+            print("Error: Invalid option.", file=sys.stderr)
+            printHelp()
+        cookies_path = sys.argv[2]
+        xh_value = sys.argv[3]
     elif len(sys.argv) == 3:
         cookies_path = sys.argv[1]
         xh_value = sys.argv[2]
+        parse_mode = 'course'
     else:
         cookies_path = "cookies.txt"   # default cookies file path
         xh_value = sys.argv[1]
+        parse_mode = 'course'
 
     # check the student id
     success, error_message = checkStudentID(xh_value)
     if not success:
         printError(error_message)
         
-    success, score_data = getScoreFromID(cookies_path, xh_value)
+    success, score_data = getScoreFromID(cookies_path, xh_value, parse_mode)
     if not success:
         printError(score_data)
     else:
-        print("Success!")
         print(score_data)
         sys.exit(0)
 
