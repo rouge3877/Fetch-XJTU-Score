@@ -17,6 +17,9 @@
 This script is used to automatically fetch the score from `ehall.xjtu.edu.cn`
 
 ## 2. Usage of the python script
+
+***<u>Before running the script, a cookies file is required. The cookies file should be exported from the browser and saved to a file. The cookies file should contain the `_WEU` and `MOD_AMP_AUTH` cookies.</u> (see chapter 4 for more details)***
+
 1. Install the required packages
 
 ```bash
