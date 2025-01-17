@@ -39,7 +39,7 @@ python main.py [-c|-s] [cookies's path] <student_id>
 - `cookies's path`: The path of the cookies file. You should export the cookies from the browser and save it to a file.
 - `student_id`: The student id of the target student.
 
-## 3. Usage of `setup.sh`
+## 3. Usage of `setup.sh`  -  *There is a bug waiting to be fixed* :(
 
 There are two setup scripts in the repository, `setup.sh` and `setup.ps1` for Linux and Windows respectively.
 These scripts help in setting up the environment, building, cleaning, running, and deactivating the virtual environment for the project.
