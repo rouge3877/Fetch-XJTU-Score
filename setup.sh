@@ -69,6 +69,14 @@ function deactivate_env() {
     deactivate
 }
 
+# 评分项目
+function score() {
+    #!/usr/bin/env zsh
+    mkdir -p score_pages
+    python3 src/main.py -s cookies.txt "$1" | python3 src/generate_html.py "$1" -s > score_pages/"$1".html
+    google-chrome score_pages/"$1".html
+}
+
 # 检查 Python 版本
 check_python_version
 
@@ -87,11 +95,15 @@ case "$1" in
         shift
         run "$@"  # 传递剩余的命令行参数
         ;;
+    score)
+        shift
+        score "$@"
+        ;;
     deactivate)
         deactivate_env
         ;;
     *)
-        echo "Usage: $0 {set_env|build|clean|run|deactivate}"
+        echo "Usage: $0 {set_env|build|clean|run|score|deactivate}"
         exit 1
         ;;
 esac
