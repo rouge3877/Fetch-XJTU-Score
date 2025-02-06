@@ -1,109 +1,120 @@
-# 参数定义部分，放在文件的最上方
-param (
-    [string]$command
-)
-
-# 检查 Python 版本
+# Check Python version
 function Check-PythonVersion {
-    $pythonCmd = "python"
-    
-    # 检查 python3 是否存在
-    # if (Get-Command python3 -ErrorAction SilentlyContinue) {
-    #     $pythonCmd = "python3"
-    # }
-
-    Write-Host "Using Python: $pythonCmd"
-    return $pythonCmd
-}
-
-# 设置虚拟环境
-function Set-Env {
-    $pythonCmd = Check-PythonVersion
-
-    Write-Host "Setting up environment..."
-    & $pythonCmd -m venv .venv
-    
-    # 激活虚拟环境
-    .\.venv\Scripts\Activate.ps1
-
-    # 安装依赖
-    pip install -r requirements.txt
-
-    Write-Host "Environment setup complete."
-}
-
-# 构建项目
-function Build {
-    Write-Host "Building project..."
-
-    # 清理 dist 目录（先检查是否存在）
-    if (Test-Path "dist") {
-        Remove-Item -Recurse -Force "dist"
-        Write-Host "Removed 'dist' directory."
+    if (Get-Command python3 -ErrorAction SilentlyContinue) {
+        $global:PYTHON_CMD = "python3"
     }
-
-    # 使用 PyInstaller 构建项目
-    pyinstaller --onefile --windowed src\main.py
-
-    Write-Host "Build completed. Executable is in the 'dist' directory."
+    else {
+        $global:PYTHON_CMD = "python"
+    }
+    Write-Output "Using Python: $global:PYTHON_CMD"
 }
 
-# 清理生成的文件
-function Clean {
-    Write-Host "Cleaning project..."
+# Setup virtual environment
+function Set-Env {
+    Write-Output "Setting up environment..."
+    & $global:PYTHON_CMD -m venv .venv
+    # Install requirements using the venv pip
+    if (Test-Path ./.venv/bin/pip) {
+        & ./.venv/bin/pip install -r requirements.txt
+    }
+    else {
+        Write-Error "pip not found in virtual environment."
+    }
+    Write-Output "Environment setup complete."
+}
 
-    # 删除生成的文件和目录（先检查是否存在）
-    $dirsToRemove = @("dist", "build", ".venv", "__pycache__", "src\main.spec", "main.spec")
-    foreach ($dirPath in $dirsToRemove) {
-        if (Test-Path $dirPath) {
-            if (Test-Path "$dirPath\*") {
-                Remove-Item -Recurse -Force $dirPath
-                Write-Host "Removed directory: $dirPath"
-            } else {
-                Remove-Item -Force $dirPath
-                Write-Host "Removed file: $dirPath"
-            }
+# Build project
+function Build-Project {
+    Write-Output "Building project..."
+    if (Test-Path ./dist) {
+        Remove-Item -Recurse -Force ./dist
+        Write-Output "Removed 'dist' directory."
+    }
+    # Use pyinstaller (assumes it is installed)
+    pyinstaller --onefile --windowed src/main.py
+    Write-Output "Build completed. Executable is in the 'dist' directory."
+}
+
+# Clean generated files
+function Clean-Project {
+    Write-Output "Cleaning project..."
+    $pathsToRemove = @("dist", "build", ".venv", "__pycache__", "src/main.spec", "main.spec")
+    foreach ($path in $pathsToRemove) {
+        if (Test-Path $path) {
+            Remove-Item -Recurse -Force $path
+            Write-Output "Removed: $path"
         }
     }
-
-    Write-Host "Clean completed."
+    Write-Output "Clean completed."
 }
 
-# 运行项目
-function Run {
+# Run project
+function Run-Project {
     param (
-        [string[]]$args
+        [Parameter(ValueFromRemainingArguments)]
+        [string[]]$ArgsList
     )
-
-    Write-Host "Running main.py with arguments: $args"
-
-    # 激活虚拟环境
-    .\.venv\Scripts\Activate.ps1
-
-    # 运行 Python 脚本并传递参数
-    python src\main.py @args
+    Write-Output "Running main.py with arguments: $ArgsList"
+    # Execute using the venv python if available, otherwise fallback to $PYTHON_CMD
+    if (Test-Path ./.venv/bin/python) {
+        & ./.venv/bin/python src/main.py @ArgsList
+    }
+    else {
+        & $global:PYTHON_CMD src/main.py @ArgsList
+    }
 }
 
-# 退出虚拟环境
+# Score project
+function Score-Project {
+    param (
+        [string]$Param
+    )
+    # Create score_pages directory if it doesn't exist
+    if (-not (Test-Path score_pages)) {
+        New-Item -ItemType Directory -Path score_pages | Out-Null
+    }
+    # Generate the score HTML
+    $command1 = { & $global:PYTHON_CMD src/main.py -s cookies.txt $using:Param }
+    $command2 = { & $global:PYTHON_CMD src/generate_html.py $using:Param -s }
+    $scoreHtml = & $command1 | & $command2
+    $outputFile = "score_pages/$Param.html"
+    $scoreHtml | Out-File -Encoding utf8 $outputFile
+    # Open the generated HTML file in google-chrome
+    google-chrome $outputFile
+}
+
+# Deactivate virtual environment
 function Deactivate-Env {
-    Write-Host "Deactivating virtual environment..."
-    deactivate
+    Write-Output "Deactivating virtual environment..."
+    Write-Output "To leave the virtual environment, close the current shell."
 }
 
-# 主程序：处理命令行输入
-$pythonCmd = Check-PythonVersion
+# Begin script execution
+Check-PythonVersion
 
-switch ($command) {
+if ($args.Count -eq 0) {
+    Write-Output "Usage: .\setup.ps1 {set_env|build|clean|run|score|deactivate} [additional arguments]"
+    exit 1
+}
+
+switch ($args[0]) {
     "set_env" { Set-Env }
-    "build" { Build }
-    "clean" { Clean }
+    "build" { Build-Project }
+    "clean" { Clean-Project }
     "run" { 
-        $args = $args[1..($args.Length - 1)]  # 获取除第一个命令外的所有参数
-        Run -args $args
+        $remainingArgs = $args[1..($args.Count - 1)]
+        Run-Project @remainingArgs 
+    }
+    "score" { 
+        if ($args.Count -lt 2) {
+            Write-Output "Usage: .\setup.ps1 score <parameter>"
+            exit 1
+        }
+        Score-Project -Param $args[1]
     }
     "deactivate" { Deactivate-Env }
     default {
-        Write-Host "Usage: .\setup_windows.ps1 {set_env|build|clean|run|deactivate}"
+        Write-Output "Usage: .\setup.ps1 {set_env|build|clean|run|score|deactivate}"
         exit 1
     }
 }
