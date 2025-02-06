@@ -6,6 +6,8 @@ cookies.txt
 
 # build files
 __pycache__/
+score_pages/
+
 build/
 dist/
 *.spec
