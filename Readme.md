@@ -32,6 +32,10 @@ pip install -r requirements.txt
 
 ```bash
 python main.py [-c|-s] [cookies's path] <student_id>
+
+mkdir -p score_pages
+python3 src/main.py -s cookies.txt $1  | python3 src/generate_html.py $1 -s > score_pages/$1.html
+google-chrome score_pages/$1.html
 ```
 
 - `-c`: Parse the course mode, default is course mode.
